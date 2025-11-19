@@ -86,8 +86,8 @@ create table Plano_personalizado(
 
 create table Exercicio_Treino(
     id_exercicio_treino int identity(0,1) primary key,
-    id_exercicio references Exercicio(id_exercicio),
-    id_treino references Treino(id_treino)
+    id_exercicio int references Exercicio(id_exercicio),
+    id_treino int references Treino(id_treino)
 )
 
 create table Plano_treino_Aluno (
@@ -100,7 +100,7 @@ create table Plano_treino_Aluno (
 
 create table Aluno_Conquista(
     id_aluno_conquista int identity(0,1) primary key, 
-    id_conquista references Conquista(id_conquista),
+    id_conquista int references Conquista(id_conquista),
     cod_aluno char(6) not null references aluno(cod_aluno),
     dta date
 )
@@ -186,5 +186,6 @@ begin
     inner join aluno aluno_relacionado
         on aluno_relacionado.nif = novos_valores.cod_aluno;
 end;
+
 
 
