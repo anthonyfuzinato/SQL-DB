@@ -10,6 +10,7 @@ create table Utilizador(
 );
 
 create table aluno(
+	cod_aluno char(6) not null primary key check (cod_aluno like 'P[0-9][0-9][0-9][0-9][0-9]'),
 	nif char(9) references utilizador(nif),
 	peso decimal(5,2) check(peso>0),
 	altura decimal(4,2),
@@ -26,7 +27,6 @@ create table aluno(
 );
 
 create table PT (
-    
     cod_pt char(6) not null primary key check (cod_pt like 'P[0-9][0-9][0-9][0-9][0-9]'),
     nif varchar(35) not null references utilizador(nif),
     especialidade text not null,
@@ -39,14 +39,14 @@ create table PT (
 
 
 create table Administrador(
-	id_admin int identity(0,1) primary key,
+	cod_admin char(6) not null primary key check (cod_pt like 'P[0-9][0-9][0-9][0-9][0-9]'),
 	nif char(9) references utilizador(nif),
 	super bit default 0
 );
 
 create table Treino (
     id_treino int not null identity(1,1) primary key,
-    nif char(6) not null references aluno(nif),  
+    cod_aluno char(6) not null references aluno(cod_aluno),  
     data_treino date default getdate() check (data_treino <= getdate()),
     duracao time not null check (duracao > '00:00'),
     calorias decimal(5,2),
@@ -93,7 +93,7 @@ create table Exercicio_Treino(
 create table Plano_treino_Aluno (
     id_t_a int identity(0,1),
     id_plano int references Plano_personalizado(id_plano),
-    nif char(6) not null references aluno(nif),
+    cod_aluno char(6) not null references aluno(cod_aluno),
     dta_inicio date,
     dta_fim date
 )
@@ -101,13 +101,13 @@ create table Plano_treino_Aluno (
 create table Aluno_Conquista(
     id_aluno_conquista int identity(0,1) primary key, 
     id_conquista references Conquista(id_conquista),
-    nif char(6) not null references aluno(nif),
+    cod_aluno char(6) not null references aluno(cod_aluno),
     dta date
 )
 
 create table Pt_Ginasio(
     id_pt_ginasio int identity(0,1) primary key,
-    nif char(6) not null references aluno(nif),
+    cod_pt char(6) not null references PT(cod_aluno),
     id_ginasio int references Ginasio(id_ginasio),
     data_admissao date
 )
@@ -121,7 +121,7 @@ create table Treino_Plano(
 
 create table Adm_Ginasio(
     id_adm_ginasio int identity (0,1) primary key,
-    nif char(6) not null references aluno(nif),
+    cod_admin char(6) not null references Administrador(cod_admin),
     id_ginasio int references Ginasio(id_ginasio),
     dta_atribuicao date,
     permissao_total bit default 0
@@ -135,7 +135,7 @@ create table Especialidade(
 
 create table Pt_Especialidade(
     id_pt_especialidade int identity (0,1) primary key,
-    nif char(6) not null references aluno(nif),
+    cod_aluno char(6) not null references aluno(cod_aluno),
     id_especialidade int references Especialidade(id_especialidade),
     certificado bit default 0,
     data_certificacao date
@@ -186,4 +186,5 @@ begin
     inner join aluno aluno_relacionado
         on aluno_relacionado.nif = novos_valores.cod_aluno;
 end;
+
 
