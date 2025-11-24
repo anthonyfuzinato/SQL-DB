@@ -1,44 +1,40 @@
 create table Utilizador(
-	nif varchar(9) unique primary key,
+	nif varchar(9) primary key,
 	email varchar(100) not null unique check(email like'%@%.%'),
-	cod_utilizador char(3) check(cod_utilizador in('a','p','adm')),
+	perfil char(3) check(cod_utilizador in('a','p')),
 	nome varchar(100) not null check((len(nome)>5) and charindex(' ',nome)>0),
 	data_criacao date default getdate(),
-	senha varchar(50) not null check((len(senha)>8) and (senha not like'% %')),
+	senha varchar(50) not null,
+	morada varchar(100) not null,
 	codigo_postal char(8) not null check (codigo_postal like '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'),
 	ativo bit default 1,
+	token varchar(max),
+	validade_token date() default dateadd(day,getdate(),1)
 );
 
 create table aluno(
-	cod_aluno char(6) primary key check (cod_aluno like 'A[0-9][0-9][0-9][0-9][0-9]'),
+	id int identity (1000,1) primary key,
 	nif varchar(9) references utilizador(nif),
 	peso decimal(5,2) check(peso>0),
 	altura decimal(4,2),
 	imc decimal(3,1),
 	data_nascimento date not null,
-	idade as (
-		datediff(year, data_nascimento, getdate())
-		- case
-			when dateadd(year, datediff(year, data_nascimento, getdate()), data_nascimento) > getdate()
-				then 1
-			else 0
-		  end
-		),
+	sexo char(1) check(sexo in ('f','m')
 );
 
 create table PT (
-    cod_pt char(6) primary key check (cod_pt like 'P[0-9][0-9][0-9][0-9][0-9]'),
+    id int identity (2000,1) primary key,
     nif varchar(9) not null references utilizador(nif),
     formacao text not null,
     experiencia text,
     avaliacao decimal(2,1) 
-        check (avaliacao between 0 and 5),
+        check (avaliacao between 0 and 5) default 0,
     preco smallmoney
 );
 
 
 create table Administrador(
-	cod_admin char(6) primary key check (cod_pt like 'ADM[0-9][0-9][0-9][0-9][0-9]'),
+	id int identity (3000,1) primary key,
 	nif char(9) references utilizador(nif),
 	super bit default 0
 );
@@ -49,7 +45,8 @@ create table Treino (
     data_treino date default getdate() check (data_treino <= getdate()),
     duracao time not null check (duracao > '00:00'),
     calorias decimal(5,2),
-    treino_personalizado bit default 0
+    treino_personalizado bit default 0,
+	descrição varchar(max),
 );
 
 create table Exercicio (
@@ -58,7 +55,7 @@ create table Exercicio (
     repeticoes smallint not null,
     series smallint not null,
     carga decimal(5,2) not null,
-    peso decimal(5,2)
+    peso decimal(5,2) not null,
 );
 
 create table Conquista (
@@ -185,5 +182,6 @@ begin
     inner join aluno aluno_relacionado
         on aluno_relacionado.nif = novos_valores.cod_aluno;
 end;
+
 
 
