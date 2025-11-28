@@ -161,27 +161,6 @@ begin
     end
 end;
 
-create trigger Calcular_Calorias
-on treino
-after insert, update
-as
-begin
-    declare @met decimal(4,2) = 8.0; 
-
-    update treino_atualizado
-    set calorias =
-        @met
-        * aluno_relacionado.peso
-        * (
-            datepart(hour, novos_valores.duracao) * 60 +
-            datepart(minute, novos_valores.duracao)
-          )
-    from treino treino_atualizado
-    inner join inserted novos_valores
-        on treino_atualizado.id_treino = novos_valores.id_treino
-    inner join aluno aluno_relacionado
-        on aluno_relacionado.nif = novos_valores.cod_aluno;
-end;
 
 
 
