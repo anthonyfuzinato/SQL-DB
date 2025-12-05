@@ -1,46 +1,45 @@
 create table Utilizador(
-	nif varchar(9) primary key,
+	nif varchar(9) not null primary key check(nif like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	email varchar(100) not null unique check(email like'%@%.%'),
-	perfil char(3) check(cod_utilizador in('a','p')),
-	nome varchar(100) not null check((len(nome)>5) and charindex(' ',nome)>0),
+	nome varchar(150) not null,
 	data_criacao date default getdate(),
 	senha varchar(50) not null,
 	morada varchar(100) not null,
 	codigo_postal char(8) not null check (codigo_postal like '[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]'),
-	ativo bit default 1,
+	ativo bit not null default 1,
 	token varchar(max),
 	validade_token date() default dateadd(day,getdate(),1)
 );
 
 create table aluno(
-	id int identity (1000,1) primary key,
+	id int identity (1000,1) not null primary key,
 	nif varchar(9) references utilizador(nif),
-	peso decimal(5,2) check(peso>0),
-	altura decimal(4,2),
+	peso decimal(5,2) check(peso>30),
+	altura decimal(3,2),
 	imc decimal(3,1),
-	data_nascimento date not null,
+	data_nascimento date not null check (datediff(year,data_nascimento,getdate()) > 14,
 	sexo char(1) check(sexo in ('f','m')
 );
 
 create table PT (
-    id int identity (2000,1) primary key,
+    id int identity (2000,1) not null primary key,
     nif varchar(9) not null references utilizador(nif),
     formacao text not null,
     experiencia text,
-    avaliacao decimal(2,1) 
-        check (avaliacao between 0 and 5) default 0,
-    preco smallmoney
+    avaliacao decimal(2,1) check (avaliacao between 0 and 5) default 0,
+    preco smallmoney,
+	ft_perfil text,
 );
 
 
 create table Administrador(
-	id int identity (3000,1) primary key,
+	id int identity (3000,1) not null primary key,
 	nif char(9) references utilizador(nif),
 	super bit default 0
 );
 
 create table Treino (
-    id_treino int identity(1,1) primary key,
+    id_treino int identity(1,1) not null  primary key,
     cod_aluno char(6) not null references aluno(cod_aluno),  
     data_treino date default getdate() check (data_treino <= getdate()),
     duracao time not null check (duracao > '00:00'),
@@ -160,6 +159,7 @@ begin
             on aluno_atualizado.nif = novos_dados.nif;
     end
 end;
+
 
 
 
